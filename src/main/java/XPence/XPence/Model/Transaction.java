@@ -1,5 +1,8 @@
 package XPence.XPence.Model;
 
+import java.time.LocalDate;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,21 +16,24 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long transactionId;
     private double amount;
+    private LocalDate registrationDate=LocalDate.now();
     private String description;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Category category;
-    
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     private Account account;
 
     public Transaction() {
 
     }
 
-    public Transaction(double amount, String description, Category category, Account account) {
+    public Transaction(double amount, LocalDate registrationDate, String description, Category category,
+            Account account) {
         super();
         this.amount = amount;
+        this.registrationDate = registrationDate;
         this.description = description;
         this.category = category;
         this.account = account;
@@ -39,6 +45,14 @@ public class Transaction {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public LocalDate getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
     public String getDescription() {

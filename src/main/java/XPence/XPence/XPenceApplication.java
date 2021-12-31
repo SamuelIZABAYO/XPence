@@ -1,13 +1,20 @@
 package XPence.XPence;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class XPenceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(XPenceApplication.class, args);
-	}
+    private static final Logger logger = LoggerFactory.getLogger(XPenceApplication.class);
+
+    public static void main(String[] args) {
+        SpringApplication.run(XPenceApplication.class, args);
+        logger.debug("This is a debug message");
+        logger.info("Info message");
+        logger.warn("Warn message");
+    }
 
 }

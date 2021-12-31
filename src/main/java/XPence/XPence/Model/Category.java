@@ -1,12 +1,10 @@
 package XPence.XPence.Model;
 
-import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import javax.persistence.OneToMany;
 
 @Entity
 public class Category {
@@ -15,21 +13,17 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long categoryId;
     private String name;
-    
+
     private TransactionType transactionType;
-    
-    @OneToMany(mappedBy = "category")
-    private List<Transaction> transaction;
 
     public Category() {
 
     }
 
-    public Category(String name, TransactionType transactionType, List<Transaction> transaction) {
+    public Category(String name, TransactionType transactionType) {
         super();
         this.name = name;
         this.transactionType = transactionType;
-        this.transaction = transaction;
     }
 
     public String getName() {
@@ -46,14 +40,6 @@ public class Category {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
-    }
-
-    public List<Transaction> getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(List<Transaction> transaction) {
-        this.transaction = transaction;
     }
 
     public Long getCategoryId() {

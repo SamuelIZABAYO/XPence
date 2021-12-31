@@ -1,13 +1,10 @@
 package XPence.XPence.Model;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Account {
@@ -18,9 +15,6 @@ public class Account {
     private String name;
     private String currency;
     private String description;
-
-    @OneToMany(mappedBy = "account")
-    private List<Transaction> transaction;
 
     @ManyToOne
     private Profile profile;
@@ -65,14 +59,6 @@ public class Account {
 
     public void setAccountId(Long accountId) {
         this.accountId = accountId;
-    }
-
-    public List<Transaction> getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(List<Transaction> transaction) {
-        this.transaction = transaction;
     }
 
     public Profile getProfile() {

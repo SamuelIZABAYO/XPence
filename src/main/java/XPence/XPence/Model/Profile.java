@@ -1,49 +1,51 @@
 package XPence.XPence.Model;
 
-import java.util.List;
+import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 @Entity
-public class Profile {
+public class Profile implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
     @Column(unique = true)
+    @NotEmpty
+    @Email
     private String email;
     private String name;
+    @NotEmpty
     private String phoneNumber;
+    @NotEmpty
     private String password;
     private String profilePicture;
 
-    @OneToMany(mappedBy = "profile")
-    private List<Account> account;
-
-    @OneToOne(targetEntity = MonthlyLimit.class)
-    private MonthlyLimit monthLimit;
+    private Boolean enabled = false;
 
     public Profile() {
     }
 
-    public Profile(String email, String name, String phoneNumber, String password, String profilePicture, MonthlyLimit monthLimit) {
+    public Profile(String email, String name, String phoneNumber, String password, String profilePicture) {
         this.email = email;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.profilePicture = profilePicture;
-        this.monthLimit = monthLimit;
     }
 
-
-    public Long getUserProfileId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserProfileId(Long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -87,19 +89,42 @@ public class Profile {
         this.profilePicture = profilePicture;
     }
 
-    public List<Account> getAccount() {
-        return account;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setAccount(List<Account> account) {
-        this.account = account;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
-    public MonthlyLimit getMonthLimit() {
-        return monthLimit;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
     }
 
-    public void setMonthLimit(MonthlyLimit monthLimit) {
-        this.monthLimit = monthLimit;
+    @Override
+    public String getUsername() {
+        return email;
     }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
 }
