@@ -1,130 +1,170 @@
 package XPence.XPence.Model;
 
 import java.util.Collection;
+import java.util.Collections;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import lombok.NoArgsConstructor;
 
 @Entity
 public class Profile implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long userId;
-    @Column(unique = true)
-    @NotEmpty
-    @Email
-    private String email;
+    private Long id;
+
+    @NotNull
     private String name;
-    @NotEmpty
-    private String phoneNumber;
-    @NotEmpty
+    
+    @NotNull
+    @Column(unique = true)
+    private String email;
+
+    @NotNull
     private String password;
+    
+    @NotNull
+    private String phoneNumber;
+
     private String profilePicture;
+    private Boolean locked;
+    private Boolean enabled;
 
-    private Boolean enabled = false;
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole = UserRole.USER;
 
+    
+    
     public Profile() {
+	super();
     }
 
     public Profile(String email, String name, String phoneNumber, String password, String profilePicture) {
-        this.email = email;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.password = password;
-        this.profilePicture = profilePicture;
+	this.email = email;
+	this.name = name;
+	this.phoneNumber = phoneNumber;
+	this.password = password;
+	this.profilePicture = profilePicture;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+	return id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setId(Long id) {
+	this.id = id;
     }
 
     public String getEmail() {
-        return email;
+	return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+	this.email = email;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+	return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+	this.phoneNumber = phoneNumber;
     }
 
     public String getPassword() {
-        return password;
+	return password;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+	this.password = password;
     }
 
     public String getProfilePicture() {
-        return profilePicture;
+	return profilePicture;
     }
 
     public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+	this.profilePicture = profilePicture;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+	SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
+	return Collections.singletonList(authority);
     }
 
     @Override
     public String getUsername() {
-        return email;
+	// TODO Auto-generated method stub
+	return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+	// TODO Auto-generated method stub
+	return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+	// TODO Auto-generated method stub
+	return !locked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+	// TODO Auto-generated method stub
+	return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+	// TODO Auto-generated method stub
+	return enabled;
+    }
+
+    public Boolean getLocked() {
+	return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+	this.locked = locked;
+    }
+
+    public Boolean getEnabled() {
+	return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+	this.enabled = enabled;
+    }
+
+    public UserRole getUserRole() {
+	return userRole;
+    }
+
+    public void setUserRole(UserRole userRole) {
+	this.userRole = userRole;
     }
 
 }

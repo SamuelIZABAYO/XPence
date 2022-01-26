@@ -38,13 +38,13 @@ public class TransactionServiceTest {
     @BeforeEach
     void setUp() {
         profile = new Profile();
-        profile.setUserId(1L);
+        profile.setId(1L);
         profile.setName("Yves");
         profile.setEmail("abc@gmail.com");
         profile.setPassword("1234");
         profile.setProfilePicture("asd.png");
         profile.setPhoneNumber("4444");
-        profile.setEnabled(false);
+        
 
         account = new Account();
         account.setAccountId(1L);

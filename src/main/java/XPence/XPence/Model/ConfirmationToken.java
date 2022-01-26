@@ -10,37 +10,39 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConfirmationToken {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long confirmId;
-
+    private Long id;
     private String confirmationToken;
-
     private LocalDate createdDate;
 
     @OneToOne(targetEntity = Profile.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "profile_id")
+    @JoinColumn(nullable = false, name = "user_id")
     private Profile profile;
 
-//    public ConfirmationToken() {
-//    }
-
     public ConfirmationToken(Profile profile) {
-        this.profile = profile;
-        this.createdDate = LocalDate.now();
-        this.confirmationToken = UUID.randomUUID().toString();
+	this.profile = profile;
+	this.createdDate = LocalDate.now();
+	this.confirmationToken = UUID.randomUUID().toString();
     }
 
-    public Long getConfirmId() {
-        return confirmId;
+    public Long getId() {
+        return id;
     }
 
-    public void setConfirmId(Long confirmId) {
-        this.confirmId = confirmId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
+    
     public String getConfirmationToken() {
         return confirmationToken;
     }
@@ -64,5 +66,6 @@ public class ConfirmationToken {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
+    
 
 }

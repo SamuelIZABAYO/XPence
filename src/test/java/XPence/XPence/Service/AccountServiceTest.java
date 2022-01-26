@@ -23,6 +23,7 @@ public class AccountServiceTest {
 
     @Autowired
     private AccountService accountService;
+    
     @MockBean
     private AccountRepository accountRepository;
     private Account account1;
@@ -33,13 +34,13 @@ public class AccountServiceTest {
     @BeforeEach
     void setUp() {
         profile = new Profile();
-        profile.setUserId(1L);
+        profile.setId(1L);
         profile.setName("Yves");
         profile.setEmail("abc@gmail.com");
         profile.setPassword("1234");
         profile.setProfilePicture("asd.png");
         profile.setPhoneNumber("4444");
-        profile.setEnabled(false);
+        profile.setEnabled(true);
 
         account1 = new Account();
         account1.setAccountId(1L);
