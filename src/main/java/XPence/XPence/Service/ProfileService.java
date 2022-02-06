@@ -5,24 +5,32 @@
  */
 package XPence.XPence.Service;
 
+import java.io.UnsupportedEncodingException;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import XPence.XPence.Model.ConfirmationToken;
 import XPence.XPence.Model.Profile;
-import XPence.XPence.Repository.ConfirmationTokenRepository;
 import XPence.XPence.Repository.ProfileRepository;
 import lombok.AllArgsConstructor;
+import net.bytebuddy.utility.RandomString;
+
+import org.springframework.security.core.userdetails.User;
 
 /**
  *
  * @author Crush
  */
+
 @Service
 @AllArgsConstructor
 public class ProfileService implements UserDetailsService {
@@ -31,52 +39,97 @@ public class ProfileService implements UserDetailsService {
     private ProfileRepository profileRepository;
 
     @Autowired
-    private ConfirmationTokenService confirmationTokenService;
+    private JavaMailSender mailSender;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private ConfirmationTokenRepository confirmationTokenRepository;
+//    @Autowired
+//    private ConfirmationTokenService confirmationTokenService;
 
-    @Autowired
-    EmailSenderService emailSenderService;
-
-    private final static String USER_NOT_FOUND_MESSAGE = "User with email {0} cannot be found.";
+//    @Autowired
+//    ConfirmationTokenRepository confirmationTokenRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-	return profileRepository.findByEmail(email)
-		.orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_MESSAGE, email)));
+	final Profile profile = profileRepository.findByEmail(email);
+	if (profile == null) {
+	    throw new UsernameNotFoundException(email);
+	}
+	boolean enabled = !profile.isEnabled();
+	UserDetails user = User.withUsername(profile.getEmail()).password(profile.getPassword()).disabled(enabled)
+		.build();
+	return user;
     }
 
-//    public void signUpUser(Profile profile) {
-//	final String encryptedPassword = bCryptPasswordEncoder.encode(profile.getPassword());
-//	profile.setPassword(encryptedPassword);
-//	final Profile createdProfile = profileRepository.save(profile);
-//	final ConfirmationToken confirmationToken = new ConfirmationToken(createdProfile);
-//	confirmationTokenService.saveConfirmationToken(confirmationToken);
-//    }
+    public Profile registerUser(Profile profile) {
+	if (checkIfUserExist(profile.getEmail())) {
+
+	    throw new RuntimeException("User with this email already exists");
+
+	} else {
+
+	    String encryptedPassword = profile.getPassword();
+	    profile.setPassword(encryptedPassword);
+	    profile.setEnabled(false);
+	    profile.setVerificationCode(generateVerificationCode());
+
+	    return profileRepository.save(profile);
+
+	}
+    }
+
+    public void sendVerificationEmail(Profile profile, String siteURL)
+	    throws UnsupportedEncodingException, MessagingException {
+
+	String subject = "Please verify your registration";
+	String senderName = "XPence verify";
+	String mailContent = "<p>Dear, " + profile.getName() + " </p><br>";
+	mailContent += "<p> Please click the link below to verify your registration: </p><br><br>";
+
+	String verifyURL = siteURL + "/verify?code=" + profile.getVerificationCode();
+
+	mailContent += "<h3><a=\"href=" + verifyURL + "\"> VERIFY YOUR ACCOUNT </a></h3>";
+
+	mailContent += "<p> Thank you <br> XPence Team.";
+
+	MimeMessage message = mailSender.createMimeMessage();
+	MimeMessageHelper helper = new MimeMessageHelper(message);
+
+	helper.setFrom("nuer911@gmail.com", senderName);
+
+	helper.setTo(profile.getEmail());
+	helper.setSubject(subject);
+
+	helper.setText(mailContent, true);
+
+	mailSender.send(message);
+    }
+
+//    public void verifyUser(String token) {
+//	ConfirmationToken confirmationToken = confirmationTokenService.findByToken(token);
+//	if (confirmationToken != null) {
+//	    Profile profile = profileRepository.findByEmail(confirmationToken.getProfile().getEmail());
+//	    profile.setEnabled(false);
+//	    profileRepository.save(profile);
+//	    confirmationTokenService.removeToken(confirmationToken);
+//	}
 //
-//    public void deleteConfirmationToken(Long id) {
-//	confirmationTokenRepository.deleteConfirmationTokenById(id);
-//    }
-//
-//    public void confirmUser(ConfirmationToken confirmationToken) {
-//	final Profile profile = confirmationToken.getProfile();
-//	profile.setEnabled(true);
-//	confirmationTokenService.deleteConfirmationToken(confirmationToken.getId());
-//    }
-//
-//    public void sendConfirmationEmail(String userEmail, String token) {
-//	SimpleMailMessage mailMessage = new SimpleMailMessage();
-//	mailMessage.setTo(userEmail);
-//	mailMessage.setSubject("My Spring Boot confirmation link!");
-//	mailMessage.setFrom("<MAIL>");
-//	mailMessage.setText("Thank you for registering. " + "Please click on the below link to activate your account."
-//		+ "http://localhost:8080/sign-up/confirm?token=" + token);
-//	emailSenderService.sendEmail(mailMessage);
 //    }
 
+    public boolean checkIfUserExist(String email) {
+	return profileRepository.findByEmail(email) != null ? true : false;
+    }
+
+    public String generateVerificationCode() {
+	String randomCode = RandomString.make(64);
+	return randomCode;
+
+    }
+
+    public String encodePassword(String password) {
+	BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+	String encrypted = bCryptPasswordEncoder.encode(password);
+	return encrypted;
+    }
 }
